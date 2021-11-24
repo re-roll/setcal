@@ -186,9 +186,37 @@ int isTran(rel_t *rel)
     return 0;
 }
 
+int isFunction (rel_t *rel)
+{
+    int a = 0;
+    int b = 0;
+
+    int a_buff = 0;
+    int b_buff = 0;
+
+    rel_t *rel_buff;
+
+    for (int i = 0; i <= max_len - 1; i++)
+    {
+        rel_buff = &rel[i];
+        checking(rel_buff, &a, &b);
+        a_buff = a;
+        b_buff = b;
+        for (int j = 0; j <= max_len - 1; j++)
+        {
+            rel_buff = &rel[j];
+            checking(rel_buff, &a, &b);
+            if ((a == a_buff) && (b != b_buff) && (a != b))
+                return 0;
+        }
+    }
+
+    return 1;
+}
+
 int main()
 {
-    rel_t rel1[max_len] = { {0,1}, {1,0}, {0,0}, {1,1}, {2,0}, {2,1}};
+    rel_t rel1[max_len] = { {3,1}, {1,3}, {0,0}, {5,1}, {7,3}, {2,1}};
     
     if (isRef (rel1))
         printf("reflexive\n");
@@ -201,6 +229,9 @@ int main()
 
     if (isTran(rel1))
         printf("transitive\n");
+    
+    if (isFunction(rel1))
+        printf("function\n");
 
     return 0;
 }
