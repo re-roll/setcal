@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define max_len 5
+#define max_len 6
 
 typedef struct
 {
@@ -29,8 +29,6 @@ int isRef(rel_t *rel)
 
         if (a == b)
             return 1;
-        else
-            continue;
     }
     
     return 0;
@@ -136,6 +134,12 @@ int isTran(rel_t *rel)
     int b_buff = 0;
     int c_buff = 0;
 
+    int x = 0;
+    int z = 0;
+
+    int cnt_a = 0;
+    int cnt_b = 0;
+
     rel_t *rel_buff;
 
     for (int i = 0; i <= max_len - 1; i++)
@@ -146,26 +150,45 @@ int isTran(rel_t *rel)
         a_buff = a;
         b_buff = b;
 
+        x = a;
+        z = b;
+
         for (int j = 0; j <= max_len - 1; j++)
         {
-            if (a == b)
-                break;
             rel_buff = &rel[j];
             checking(rel_buff, &a, &b);
             if (a == b_buff)
             {
+                cnt_a++;
                 checking(rel_buff, &b_buff, &c_buff);
-                printf("(%d %d) (%d %d) -> (%d %d)\n", a_buff, b_buff, b_buff, c_buff, a_buff, c_buff);
+                if ((a_buff == x) && (c_buff == z))
+                {
+                    cnt_b++;
+                    break;
+                }
+                for (int k = 0; k <= max_len - 1; k++)
+                {
+                    rel_buff = &rel[k];
+                    checking(rel_buff, &x, &z);
+                    if ((a_buff == x) && (c_buff == z))
+                    {
+                        cnt_b++;
+                        break;
+                    }
+                }
             }
         }
     }
+
+    if (cnt_a == cnt_b)
+        return 1;
 
     return 0;
 }
 
 int main()
 {
-    rel_t rel1[max_len] = { {0,3}, {3,2}, {3,3}, {1,1}, {4,0} };
+    rel_t rel1[max_len] = { {0,1}, {1,0}, {0,0}, {1,1}, {2,0}, {2,1}};
     
     if (isRef (rel1))
         printf("reflexive\n");
@@ -176,7 +199,8 @@ int main()
     if (isAntisym (rel1))
         printf("antisymmetric\n");
 
-    isTran(rel1);
+    if (isTran(rel1))
+        printf("transitive\n");
 
     return 0;
 }
