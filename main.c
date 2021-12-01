@@ -4,6 +4,8 @@
 #define max_len 6
 #define max_len_u 8
 
+#define max_len_r 30
+
 typedef struct
 {
     int x;
@@ -163,20 +165,14 @@ int isTran(rel_t *rel)
 
         x = a;
         z = b;
-
         for (int j = 0; j < max_len; j++)
         {
             rel_buff = &rel[j];
             checking(rel_buff, &a, &b);
-            if (a == b_buff)
+            if ((a == b_buff) && (b == a_buff))
             {
                 cnt_a++;
                 checking(rel_buff, &b_buff, &c_buff);
-                if ((a_buff == x) && (c_buff == z))
-                {
-                    cnt_b++;
-                    break;
-                }
                 for (int k = 0; k < max_len; k++)
                 {
                     rel_buff = &rel[k];
@@ -319,8 +315,10 @@ int isSur(rel_t *rel, uni_t *uni)
         {
             rel_buff = &rel[j];
             checking(rel_buff, &a, &b);
-            if (b == x)
+            if (x == b)
             {
+                if (a == b)
+                    cnt++;
                 cnt++;
                 break;
             }
@@ -341,11 +339,102 @@ int isBij(rel_t *rel, uni_t *uni)
     return 0;
 }
 
+int cnts(char *str)
+{
+    int len = 38;
+
+    int cnt = 0;
+
+    for (int i = 0; i < len; i++)
+    {
+        if (str[i] == '(')
+            cnt++;
+        if ((str[i] == ' ') && (str[i-1] != ')'))
+            cnt++;
+    }
+
+    return cnt;
+}
+
+int cmprStr(char* str1, char* str2) //Function gets two strings and compare it
+{
+    int len = 38;         //In the cycle we will work only with strings which length is already approaches
+    for (int i = 0; i < len; i++)   //So I count to the last symbol in the string, not to 100
+        if (str1[i] != str2[i])     //Function does the compare for each symbol
+            return 0;               //And I will get 0 if strings are not the same
+
+    return 1;                       //I will get 1 if strings are the same
+}
+
+void test()
+{
+    char str[] = "(dad mom) (dad girl) (woman pineapple)";
+    int cnt = cnts(str);
+    
+    int len = 38;
+    char str1[cnt][max_len_r];
+
+    int cnt_i = -1;
+    int cnt_j = -1;
+
+    for (int i = 0; i < cnt; i++)
+        for (int j = 0; j < max_len_r; j++)
+            str1[i][j] = '0';
+
+    for (int i = 0; i < len; i++)
+    {
+        if (str[i] == '(')
+        {
+            cnt_i++;
+            for (int j = i+1; j <= i + 1 + max_len_r; j++)
+            {
+                cnt_j++;
+                if (str[j] == ' ')
+                    break;
+                if (cnt_i <= cnt)
+                    str1[cnt_i][cnt_j] = str[j];
+            }
+        }
+        cnt_j = -1;
+        if (str[i] == ' ')
+        {
+            cnt_i++;
+            for (int j = i + 1; j <=  i + 1 + max_len_r; j++)
+            {
+                cnt_j++;
+                if (str[j] == ')')
+                    break;
+                if (cnt_i <= cnt)
+                    str1[cnt_i][cnt_j] = str[j];
+            }
+        }
+        cnt_j = -1;
+        if (str[i] == ')')
+            i++;
+    }
+
+    char xyz[38];
+    char zyx[38];
+
+    for (int i = 0; i < cnt; i++)
+    {
+        for (int j = 0; j < max_len_r; j++)
+        {
+        xyz[i] = str1[i][j];
+        zyx[i] = str1[i+1][j];
+        }
+    }
+    printf("%s\n", xyz);
+    printf("%s\n", zyx);
+}
+
 int main()
 {
-    rel_t rel1[max_len] = { {3,8}, {6,9}, {0,0}, {5,5}, {7,2}, {2,6}};
+    rel_t rel1[max_len] = { {3,8}, {8,3}, {3,3}, {8,8}, {6,7}, {5,9}};
     uni_t uni[max_len_u] = {{3}, {8}, {6}, {9}, {0}, {5}, {7}, {2}};
-    
+
+    test();
+    printf("\n");
     if (isRef (rel1))
         printf("reflexive\n");
     
